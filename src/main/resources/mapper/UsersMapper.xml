@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.slkj.sloa.Dao.UserMapper">
+	<sql id="sql_base">
+		ID,USERNAME,PASSWORD,STATUS,REALNAME,SEX,EMAIL,PHONE,ADDRESS,CREATE_TIME,LASTTIME,REMARK,ROLEID,
+		DEPARTCODE,(SELECT D_NAME FROM OA_DEPARTMENT WHERE DEPARTCODE = ID) AS
+		DEPARTNAME
+	</sql>
+	<select id="queryAll" resultType="User" parameterType="hashmap">
+		SELECT
+		<include refid="sql_base"></include>
+		FROM OA_USER
+	</select>
+
+	<select id="userLogin" resultType="User" parameterType="hashmap">
+		select * from oa_user where username =#{username,jdbcType=VARCHAR} and password =#{password,jdbcType=VARCHAR}
+	</select>
+	<select id="getAllUsers" resultType="User">
+		SELECT
+		<include refid="sql_base"></include>
+		FROM OA_USER
+		<where>
+			<if test="status != null and status != ''">
+				AND STATUS = #{status}
+			</if>
+			<if test="username != null and username != ''">
+				AND USERNAME LIKE '%'+#{username}+'%'
+			</if>
+			<if test="realname != null and realname != ''">
+				AND REALNAME LIKE '%'+#{realname}+'%'
+			</if>
+			<if test="departcode != null and departcode != ''">
+				AND DEPARTCODE IN (SELECT ID FROM F_GETC( #{departcode}))
+			</if>
+			<if test="roleId != null and roleId != ''">
+				AND ROLEID = #{roleId} 
+			</if>
+		</where>
+	</select>
+	<select id="queryOne" parameterType="hashmap" resultType="User">
+		SELECT
+		<include refid="sql_base"></include>
+		FROM OA_USER
+		<where>
+			<if test="username != null and   username != ''">
+				AND USERNAME = #{username}
+			</if>
+			<if test="password != null and   password != ''">
+				AND PASSWORD = #{password}
+			</if>
+			<if test="id != null and   id != ''">
+				AND ID = #{id}
+			</if>
+		</where>
+	</select>
+	<insert id="save" parameterType="User">
+		INSERT INTO OA_USER(
+		ID,USERNAME,PASSWORD,STATUS,EMAIL,REALNAME,SEX,PHONE,DEPARTCODE,CREATE_TIME,LASTTIME,REMARK,ROLEID,ADDRESS
+		)
+		VALUES(#{id},#{username},#{password},#{status},#{email},#{realname},#{sex},
+		#{phone},#{departcode},#{create_time},#{lastTime},#{remark},#{roleId},#{address})
+	</insert>
+
+	<delete id="delete" parameterType="string">
+		DELETE FROM OA_USER WHERE ID
+		=#{id}
+	</delete>
+
+	<update id="edit" parameterType="User">
+		UPDATE OA_USER SET
+		STATUS=#{status}
+		,EMAIL=#{email},REALNAME=#{realname},SEX=#{sex},PHONE=#{phone},DEPARTCODE=#{departcode},
+		REMARK=#{remark}, roleId=#{roleId},address = #{address}
+		WHERE ID =
+		#{id}
+	</update>
+</mapper>

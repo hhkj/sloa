@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC
+        "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<!-- 打印查询语句 -->
+		<setting name="logImpl" value="STDOUT_LOGGING" />
+	</settings>
+	<typeAliases>
+		<typeAlias alias="LinkedCaseInsensitiveMap" type="org.springframework.util.LinkedCaseInsensitiveMap" />
+		<typeAlias alias="User" type="cn.slkj.sloa.Entity.system.User" />
+		<typeAlias alias="Menus" type="cn.slkj.sloa.Entity.system.Menus" />
+		<typeAlias alias="Role" type="cn.slkj.sloa.Entity.system.Role" />
+		<typeAlias alias="Department" type="cn.slkj.sloa.Entity.system.Department" />
+		<typeAlias alias="Vehicle" type="cn.slkj.sloa.Entity.Vehicle" />
+		<typeAlias alias="Devices" type="cn.slkj.sloa.Entity.Devices" />
+		<typeAlias alias="Devices_record" type="cn.slkj.sloa.Entity.Devices_record" />
+	</typeAliases>
+	<plugins>
+		<plugin interceptor="com.github.miemiedev.mybatis.paginator.OffsetLimitInterceptor">
+			<property name="dialectClass" value="com.github.miemiedev.mybatis.paginator.dialect.SQLServer2005Dialect" />
+		</plugin>
+	</plugins>
+</configuration>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.slkj.sloa.Dao.VehicleMapper">
+<select id="getList" resultType="Vehicle" parameterType="hashmap">
+        SELECT TBV.*, TBC.COMPNAME AS COMPANYNAME,OFE.NUMBER AS NETWORKNO,OFE.ENDTIME AS FEESEEND
+        FROM OA_VEHICLE TBV 
+        LEFT JOIN OA_COMPANY TBC ON TBV.COMPANYID = TBC.ID
+        LEFT JOIN (SELECT OE.* ,OA_FEES.NUMBER FROM (SELECT CARNUMBER,MAX(ENDTIME)AS ENDTIME FROM OA_FEES        
+         GROUP BY CARNUMBER)OE,oa_fees WHERE OE.carNumber=oa_fees.carNumber AND OE.ENDTIME=oa_fees.endTime)OFE 
+        ON TBV.CARNUMBER = OFE.CARNUMBER 
+      
+        <where>            
+            <if test="equitment != null and equitment != ''">
+                AND TBV.EQUITMENT LIKE '%'+#{equitment}+'%'
+            </if>
+            <if test="companyId != null and companyId != ''">
+                AND TBV.COMPANYID = #{companyId}
+            </if>
+            <if test="carNumber != null and carNumber != ''">
+                AND TBV.CARNUMBER LIKE '%'+#{carNumber}+'%'
+            </if>
+            <if test="simNumber != null and simNumber != ''">
+                AND TBV.SIMNUMBER LIKE '%'+#{simNumber}+'%'
+            </if>            
+            <if test="companyName != null and companyName != ''">
+                AND TBC.COMPNAME   LIKE '%'+#{companyName}+'%'
+            </if>
+            <if test="carOwner != null and carOwner != ''">
+                AND TBV.carOwner LIKE '%'+#{carOwner}+'%'
+            </if>
+             <if test="feeseEnd != null and feeseEnd != ''">
+                AND TBV.feeseEnd &gt;= #{feeseEnd}				
+            </if>
+ 			<if test="feeseEnd1 != null and feeseEnd1 != ''">
+                AND TBV.feeseEnd &lt;= #{feeseEnd1}				
+            </if>   
+             <if test="seasonExamE1 != null and seasonExamE1 != ''">
+                AND TBV.seasonExamE &gt;= #{seasonExamE1}				
+            </if>
+ 			<if test="seasonExamE2 != null and seasonExamE2 != ''">
+                AND TBV.seasonExamE &lt;= #{seasonExamE2}				
+            </if>   
+            <if test="yearExamE1 != null and yearExamE1 != ''">
+                AND TBV.yearExamE &gt;= #{yearExamE1}				
+            </if>
+ 			<if test="yearExamE2 != null and yearExamE2 != ''">
+                AND TBV.yearExamE &lt;= #{yearExamE2}				
+            </if>  
+            <!-- <if test="depId != null and depId != ''">
+				AND depId IN (SELECT ID FROM F_GETC( #{depId}))
+			</if>  -->       
+        </where>
+    </select>
+    
+
+    <select id="queryOne" parameterType="hashmap" resultType="Vehicle">
+        SELECT TBV.*, TBC.COMPNAME AS COMPANYNAME,OFE.NUMBER AS NETWORKNO,OFE.ENDTIME AS FEESEEND
+        FROM OA_VEHICLE TBV 
+        LEFT JOIN OA_COMPANY TBC ON TBV.COMPANYID = TBC.ID
+        LEFT JOIN (SELECT OE.* ,OA_FEES.NUMBER FROM (SELECT CARNUMBER,MAX(ENDTIME)AS ENDTIME FROM OA_FEES        
+         GROUP BY CARNUMBER)OE,oa_fees WHERE OE.carNumber=oa_fees.carNumber AND OE.ENDTIME=oa_fees.endTime)OFE 
+        ON TBV.CARNUMBER = OFE.CARNUMBER
+        <where>
+            <if test="id != null and id != ''">
+                AND TBV.ID = #{id}
+            </if>
+            <if test="carNumber != null and carNumber != ''">
+                AND TBV.CARNUMBER = #{carNumber} 
+            </if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="Vehicle">
+        INSERT INTO OA_VEHICLE (
+        	id, companyId, carOwner, contacts, contactsTel, carNumber, plateColor, issuingUnit,
+        	 retDate, carType, carBrand, carModel, carColor, carVin, made, carEngNum, carEngModel,
+        	  carFuelType, power, factory, steering, wheelTrack, tyreNumber, tyreModel, 
+ 			springNumber, wheelBase, axleNumber, carOutLength, carOutWidth, carOutHeight, carContLength,
+ 			 carContWidth, carContHeight,carTotalmass, carApproved, carApprGuest, carTrac, cabGuest,
+ 			  useCharacter, access, produce, equitment, simNumber, installers,installtime,depId,keepTime
+        )
+        VALUES
+        	(
+        		#{ id },#{ companyId },#{ carOwner },#{ contacts },#{ contactsTel },#{ carNumber }, #{ plateColor },#{ issuingUnit },
+               #{retDate}, #{ carType },#{ carBrand },#{ carModel },#{ carColor },#{ carVin },#{ made },#{ carEngNum },#{ carEngModel }, 
+                #{ carFuelType },#{ power },#{ factory },#{ steering },#{ wheelTrack },#{ tyreNumber },#{ tyreModel },
+                 #{ springNumber },#{ wheelBase },#{ axleNumber }, #{ carOutLength },#{ carOutWidth },#{ carOutHeight },#{ carContLength },
+               #{ carContWidth },#{ carContHeight }, #{ carTotalmass },#{ carApproved },#{ carApprGuest },#{ carTrac },#{ cabGuest },
+                 #{ useCharacter },#{ access },#{ produce },#{ equitment }, #{ simNumber },#{ installers },#{ installtime },#{depId} ,GETDATE()
+        	)
+    </insert>
+
+    <update id="edit" parameterType="Vehicle">
+        UPDATE OA_VEHICLE  SET 
+            companyId=#{companyId}, carOwner=#{carOwner}, contacts=#{contacts}, contactsTel=#{contactsTel},
+             carNumber=#{carNumber}, plateColor=#{plateColor}, issuingUnit=#{issuingUnit}, retDate=#{retDate}, 
+        	carType=#{carType}, carBrand=#{carBrand}, carModel=#{carModel},  carColor=#{carColor}, carVin=#{carVin},
+        	 made=#{made}, carEngNum=#{carEngNum}, carEngModel=#{carEngModel},carFuelType=#{carFuelType}, power=#{power},
+        	   factory=#{factory}, steering=#{steering}, wheelTrack=#{wheelTrack}, tyreNumber=#{tyreNumber}, 
+        	   tyreModel=#{tyreModel},springNumber=#{springNumber}, wheelBase=#{wheelBase}, axleNumber=#{axleNumber},
+        	    carOutLength=#{carOutLength}, carOutWidth=#{carOutWidth}, carOutHeight=#{carOutHeight}, carContLength=#{carContLength},
+ 			 carContWidth=#{carContWidth}, carContHeight=#{carContHeight},carTotalmass=#{carTotalmass}, carApproved=#{carApproved},
+ 			  carApprGuest=#{carApprGuest}, carTrac=#{carTrac}, cabGuest=#{cabGuest},useCharacter=#{useCharacter}, access=#{access},
+ 			   produce=#{produce}, equitment=#{equitment}, simNumber=#{simNumber}, installers=#{installers},
+ 			   installtime=#{installtime}
+        WHERE ID = #{ id }
+    </update>
+	<update id="editSeasonExam" parameterType="Vehicle">
+        UPDATE OA_VEHICLE  SET 
+            seasonExamS=#{seasonExamS}, seasonExamE=#{seasonExamE}
+        WHERE
+        	ID = #{ id }
+    </update>
+    <update id="editYearExam" parameterType="Vehicle">
+        UPDATE OA_VEHICLE  SET 
+            yearExamS=#{yearExamS}, yearExamE=#{yearExamE}
+        WHERE
+        	ID = #{ id }
+    </update>
+    <delete id="delete" parameterType="string">
+        DELETE FROM OA_VEHICLE
+        WHERE ID = #{id}
+    </delete>
+  
+  
+    <update id="sfbz" parameterType="Vehicle">
+        UPDATE OA_VEHICLE  SET 
+            uprice=#{uprice} 
+        WHERE
+        	ID = #{ id }
+    </update>
+</mapper>

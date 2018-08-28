@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.slkj.sloa.Dao.DepartmentMapper">
+	<sql id="sql_temp">
+		id, d_name,
+		parentid,parentname,d_type,d_icon,d_fuzeren,d_tel,d_fax,d_add,
+		d_email,d_miaoshu,d_order,d_code
+	</sql>
+	<select id="queryList" resultType="Department" parameterType="hashmap">
+		SELECT
+		<include refid="sql_temp" />
+		FROM OA_DEPARTMENT
+		<where>
+			<if test="code != null and code != ''">
+				AND D_CODE LIKE #{code}+'%'
+			</if>
+			<if test="id != null and id != ''">
+				AND PARENTID IN (SELECT ID FROM F_GETC( #{id}))
+				OR ID =
+				#{id}
+			</if>
+
+		</where>
+	</select>
+	<select id="queryOne" resultType="Department" parameterType="string">
+		SELECT
+		<include refid="sql_temp" />
+		FROM OA_DEPARTMENT WHERE id = #{id}
+	</select>
+
+	<insert id="save" parameterType="Department">
+		INSERT INTO OA_DEPARTMENT
+		(d_name,
+		parentid,parentname,d_type,d_icon,d_fuzeren,d_tel,d_fax,d_add,
+		d_email,d_miaoshu,d_order,d_code)
+		VALUES(
+		#{d_name},#{parentid},#{parentname},#{d_type},#{d_icon},#{d_fuzeren},#{d_tel},#{d_fax},#{d_add},#{d_email},#{d_miaoshu},#{d_order},#{d_code})
+	</insert>
+
+	<update id="edit" parameterType="Department">
+		UPDATE OA_DEPARTMENT SET
+		D_NAME=#{ d_name}, PARENTID=#{
+		parentid},PARENTNAME=#{parentname},D_TYPE=#{d_type},
+		D_ICON=#{d_icon},D_FUZEREN=#{d_fuzeren},D_TEL=#{d_tel}, D_FAX=#{
+		d_fax},D_ADD=#{d_add},
+		D_EMAIL=#{d_email},D_MIAOSHU=#{d_miaoshu},D_ORDER=#{d_order} WHERE ID=
+		#{id}
+	</update>
+
+	<delete id="delete" parameterType="string">
+		DELETE FROM OA_DEPARTMENT
+		WHERE ID = #{id}
+	</delete>
+
+
+
+
+</mapper>

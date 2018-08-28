@@ -1,0 +1,37 @@
+[
+    {
+        "pkey": 161,
+        "lookupCode": "CARPLATE_COLOR",
+        "key": "Y",
+        "value": "黄色",
+        "sequence": 1
+    },
+    {
+        "pkey": 162,
+        "lookupCode": "CARPLATE_COLOR",
+        "key": "U",
+        "value": "蓝色",
+        "sequence": 2
+    },
+    {
+        "pkey": 163,
+        "lookupCode": "CARPLATE_COLOR",
+        "key": "B",
+        "value": "黑色",
+        "sequence": 3
+    },
+    {
+        "pkey": 164,
+        "lookupCode": "CARPLATE_COLOR",
+        "key": "W",
+        "value": "白色",
+        "sequence": 4
+    },
+    {
+        "pkey": 165,
+        "lookupCode": "CARPLATE_COLOR",
+        "key": "O",
+        "value": "其他",
+        "sequence": 9
+    }
+]

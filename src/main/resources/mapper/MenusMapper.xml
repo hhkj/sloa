@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.slkj.sloa.Dao.MenusMapper">
+	<sql id="sql_base">
+		 menuid,parentMenu,menuname,icon,url
+	</sql>
+	<select id="queryAll" resultType="Menus" parameterType="hashmap">
+		SELECT
+			<include refid="sql_base"></include>
+		FROM TB_MENUS
+	</select>
+	<insert id="insert" parameterType="Menus">
+		INSERT INTO TB_MENUS
+		(parentMenu,menuname,icon,url)
+		VALUES(#{parentMenu},#{menuname},#{icon},#{url})
+	</insert>
+
+</mapper>

@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.slkj.sloa.Dao.DevicesMapper">
+	<sql id="sql_base">
+		ID,PACK,LISTNUM,FIRM,MODEL,RKTIME,STATE,FHTIME,LYR,LYTIME,
+		TEST,CSTIME,TRESULT,REMARK,GPSZJ,GSMTX,GPSTX,DY,FSD,JSQ,SXY,YSQ,MKF,
+		DEPARTMENT,(SELECT D_NAME FROM OA_DEPARTMENT WHERE ID = DEPARTMENT) AS
+		DEPARTMENTNAME,
+		SIMNUMBER,NETWORKNO,INSTALLERS,INSTALLTIME,CARNUMBER,COMPANYID,
+		(SELECT COMPNAME FROM OA_COMPANY WHERE ID = COMPANYID) AS
+		COMPANYNAME,PACKBM,INSPECTOR,USTATE,USTYPE,RECEIVE
+	</sql>
+	<select id="getAll" resultType="Devices">
+		SELECT
+		<include refid="sql_base"></include>
+		FROM OA_DEVICES
+		<where>
+			<if test="listnum != null and listnum != ''">AND LISTNUM like '%'+#{listnum}+'%'</if>
+			<if test="rktime != null and rktime != ''">AND RKTIME >= #{rktime} </if>
+			<if test="rktime1 != null and rktime1 != ''"> AND RKTIME &lt;= #{rktime1} </if>
+			<if test="lytime != null and lytime != ''">AND LYTIME >= #{lytime} </if>
+			<if test="lytime1 != null and lytime1 != ''"> AND LYTIME &lt;= #{lytime1} </if>
+			<if test="fhtime != null and fhtime != ''">AND FHTIME >= #{fhtime} </if>
+			<if test="fhtime1 != null and fhtime1 != ''"> AND FHTIME &lt;= #{fhtime1} </if>
+			<if test="state != null and state != ''">AND STATE = #{state} </if>
+			<if test="state == 3 and state == '3'">AND STATE = '3' </if>
+			<if test="ustate != null and ustate != ''">AND USTATE = #{ustate} </if>
+			<if test="lyr != null and lyr != ''"> AND LYR LIKE '%'+#{lyr}+'%' </if>
+			<if test="firm != null and firm != ''">AND FIRM LIKE '%'+#{firm}+'%'  </if>
+			<if test="test != null and test != ''">AND TEST = #{test} </if>
+			<if test="model != null and model != ''">AND MODEL LIKE '%'+#{model}+'%'  </if>
+			<if test="packBm != null and packBm != ''">
+				AND PACKBM IN
+				<foreach collection="packBm" index="index" item="item" open="("
+					separator="," close=")">
+					#{item}
+				</foreach>
+
+			</if>
+			<if test="department != null and department != ''">
+				AND DEPARTMENT IN (SELECT ID FROM F_GETC( #{department}))
+				<!-- OR DEPARTMENT =#{department} -->
+			</if>
+			<if test="carNumber != null and carNumber != ''">AND CARNUMBER LIKE '%'+#{carNumber}+'%'  </if>
+			<if test="simNumber != null and simNumber != ''">AND SIMNUMBER LIKE '%'+#{simNumber}+'%'  </if>
+
+			<if test="inspector != null and inspector != ''">AND INSPECTOR LIKE '%'+#{inspector}+'%'  </if>
+		</where>
+	</select>
+
+
+
+
+	<select id="getList" resultType="Devices" parameterType="hashmap">
+		SELECT
+		<include refid="sql_base"></include>
+		FROM OA_DEVICES
+		<where>
+			<!-- AND STATE = 1 AND USTATE = 0 -->
+			<if test="listnum != null and listnum != ''">AND LISTNUM like '%'+#{listnum}+'%'</if>
+			<if test="rktime != null and rktime != ''">AND RKTIME >= #{rktime} </if>
+			<if test="rktime1 != null and rktime1 != ''"> AND RKTIME &lt;= #{rktime1} </if>
+			<if test="lytime != null and lytime != ''">AND LYTIME >= #{lytime} </if>
+			<if test="lytime1 != null and lytime1 != ''"> AND LYTIME &lt;= #{lytime1} </if>
+			<if test="fhtime != null and fhtime != ''">AND FHTIME >= #{fhtime} </if>
+			<if test="fhtime1 != null and fhtime1 != ''"> AND FHTIME &lt;= #{fhtime1} </if>
+			<if test="state != null and state != ''">AND STATE = #{state} </if>
+			<if test="ustate != null and ustate  != ''">AND USTATE = #{ustate} </if>
+			<if test="ustate != null and ustate != ''">AND USTATE = #{ustate} </if>
+			<if test="lyr != null and lyr != ''"> AND LYR LIKE '%'+#{lyr}+'%' </if>
+			<if test="firm != null and firm != ''">AND FIRM LIKE '%'+#{firm}+'%'  </if>
+			<if test="test != null and test != ''">AND TEST = #{test} </if>
+			<if test="packBm != null and packBm != ''">
+				AND PACKBM IN
+				<foreach collection="packBm" index="index" item="item" open="("
+					separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="department != null and department != ''">AND DEPARTMENT IN (SELECT ID FROM F_GETC( #{department}))
+			</if>
+			<if test="carNumber != null and carNumber != ''">AND CARNUMBER LIKE '%'+#{carNumber}+'%'  </if>
+		</where>
+	</select>
+	<insert id="insert" parameterType="Devices">
+		IF NOT EXISTS (SELECT * FROM
+		OA_DEVICES WHERE listnum =#{listnum})
+		BEGIN
+		INSERT INTO OA_DEVICES
+		(
+		id,pack,listnum,firm,model,rktime,state,fhtime,lyr,lytime,
+		test,cstime,tresult,remark,gpszj,gsmtx,gpstx,dy,fsd,jsq,sxy,ysq,mkf,department)
+		VALUES(
+		#{id},#{pack},#{listnum},#{firm},#{model},#{rktime}
+		,#{state},#{fhtime},#{lyr},#{lytime},
+		#{test},#{cstime},#{tresult},#{remark},#{gpszj},#{gsmtx},#{gpstx},#{dy},#{fsd},#{jsq},
+		#{sxy},#{ysq},#{mkf},#{department})
+		END
+	</insert>
+	<update id="ckData" parameterType="hashmap">
+		UPDATE OA_DEVICES SET
+		RECEIVE='',RECEIVETIME='',RECIPIENT='',
+		lyrid
+		=#{lyrid},
+		state=#{state} ,lyr
+		=#{lyr},lytime=#{lytime},department=#{department} ,remark
+		= #{remark}
+		WHERE ID in
+		<foreach collection="ids" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<select id="getListRecd" resultType="Devices_record"
+		parameterType="hashmap">
+		SELECT (SELECT d_name FROM oa_department WHERE id=site)
+		as site, cktime, lydepartment, lyr, qsstate, qsr, qstime,
+		ustate,
+		remark,(SELECT D_NAME FROM OA_DEPARTMENT WHERE ID =
+		lydepartment) AS
+		departmentname
+		FROM OA_DEVICES_RECORD WHERE devices_id =#{listnum} and
+		type_id=1 ORDER BY cktime DESC
+	</select>
+	<insert id="insert_recordList" parameterType="map">
+		INSERT OA_DEVICES_RECORD (devices_id, site, cktime, lydepartment,
+		lyr,qsstate, qsr, qstime, ustate, remark,type_id)
+		SELECT
+		LISTNUM,#{site},LYTIME,DEPARTMENT,LYR,'','','',state,REMARK,1
+		FROM
+		OA_DEVICES A WHERE A.ID IN
+		<foreach item="ids" collection="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</insert>
+
+	<update id="outRepertory" parameterType="Devices">
+		UPDATE OA_DEVICES SET
+		RECEIVE='',RECEIVETIME='',RECIPIENT='',
+		state=#{state},lyr
+		=#{lyr},lyrid =#{lyrid},lytime=#{lytime},area=#{area},areaName=
+		(select
+		note from tb_xzqh where code = #{area}),remark=#{remark}
+		WHERE
+		ID=#{id}
+	</update>
+	<update id="isReceive" parameterType="hashmap">
+		UPDATE OA_DEVICES SET
+		RECEIVE=#{receive} ,RECEIVETIME
+		=#{receiveTime},RECIPIENT=#{recipient}
+		WHERE ID IN
+		<foreach item="ids" collection="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</update>
+
+	<update id="revoke" parameterType="hashmap">
+		UPDATE OA_DEVICES SET
+		state=2 ,lyr
+		='',lytime='',department=#{department} ,ustate ='0'
+		WHERE ID IN
+		<foreach item="ids" collection="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</update>
+
+	<delete id="deletes" parameterType="list">
+		DELETE FROM OA_DEVICES WHERE ID in
+		<foreach item="ids" collection="array" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</delete>
+
+
+	<update id="packList" parameterType="Devices">
+
+		if exists ( SELECT * FROM OA_DEVICES WHERE listnum =#{listNumber})
+		begin
+		UPDATE OA_DEVICES SET firm =#{firm}, cstime
+		=#{cstime},tresult=#{tresult},remark=#{remark},inspector=
+		#{inspector},ustype=#{ustype}
+
+		<if test="packBm != null and packBm != ''">
+			, packBm=#{packBm}
+		</if>
+		WHERE LISTNUM = #{listNumber}
+		end
+		else
+		begin
+		INSERT INTO OA_DEVICES
+		(ID,LISTNUM,FIRM,RKTIME,PACKBM,TEST,CSTIME,TRESULT,INSPECTOR,REMARK,ustype)
+		VALUES(
+		NEWID(),#{listNumber},#{firm},#{rktime},#{packBm},'1',#{cstime},#{tresult},#{inspector},#{remark},#{ustype}
+		)
+		end
+	</update>
+	<update id="edit" parameterType="Devices">
+		UPDATE OA_DEVICES SET
+		packBm
+		=#{packBm},state=#{state},ustate=#{ustate},
+		listnum=
+		#{listnum},simNumber=#{simNumber},department=#{department},
+		test=#{test},ustype=#{ustype}, lyr=#{lyr}, lytime=#{lytime},
+		remark=#{remark}
+		WHERE ID = #{id}
+	</update>
+
+	<insert id="insert_record" parameterType="Devices">
+		<!-- INSERT INTO OA_DEVICES_RECORD (id,fhtime,remark) VALUES(#{id},#{fhtime},#{remark} 
+			) -->
+		INSERT OA_DEVICES_RECORD
+		SELECT
+		LISTNUM,LYTIME,LYR,DEPARTMENT,CARNUMBER,INSTALLERS,INSTALLTIME,COMPANYID,FHTIME
+		FROM OA_DEVICES A
+		WHERE A.LISTNUM=#{listnum}
+	</insert>
+
+	<select id="getAllRecord" resultType="Devices_record">
+
+		SELECT devices_id, (SELECT d_name FROM oa_department WHERE id=site) as
+		site, cktime, lydepartment, lyr, qsstate, qsr, qstime,
+		ustate,
+		remark,(SELECT D_NAME FROM OA_DEPARTMENT WHERE ID =
+		lydepartment) AS
+		departmentname
+		FROM OA_DEVICES_RECORD
+		<where>
+			<!-- AND STATE = 1 AND USTATE = 0 -->
+			<if test="dev_id != null and dev_id != ''">AND DEVICES_ID = #{dev_id} </if>
+			<if test="department != null and department != ''">AND lydepartment IN (SELECT ID FROM F_GETC(
+				#{department}))
+			</if>
+			and type_id=1
+		</where>
+	</select>
+
+	<select id="queryOne" resultType="Devices" parameterType="hashmap">
+		SELECT
+		<include refid="sql_base"></include>
+		FROM OA_DEVICES WHERE LISTNUM =#{listnum}
+	</select>
+
+	<update id="testing" parameterType="map">
+		UPDATE OA_DEVICES SET TEST = 1,
+		TRESULT=#{tresult},CSTIME=#{cstime},REMARK=#{remark},INSPECTOR=#{inspector},
+		PACKBM=#{packBm},USTYPE=#{ustype},SIMNUMBER=#{simNumber}
+		WHERE ID IN
+		<foreach item="ids" collection="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</update>
+
+	<update id="pack" parameterType="map">
+		UPDATE OA_DEVICES SET PACKBM=#{packBm}
+		WHERE ID IN
+		<foreach item="ids" collection="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</update>
+
+	<!-- <select id="getCountByListnum" resultType="int" parameterType="string"> 
+		SELECT COUNT(id) FROM OA_DEVICES where listnum=#{listnum} </select> -->
+	<!-- <insert id="insertBatch" useGeneratedKeys="true" parameterType="java.util.List"> -->
+	<insert id="insertBatch" useGeneratedKeys="true" parameterType="Devices">
+		IF EXISTS (SELECT * FROM OA_DEVICES WHERE listnum =#{listnum})
+		BEGIN
+		UPDATE OA_DEVICES
+		SET PACK=#{pack} WHERE listnum =#{listnum}
+		END
+		ELSE
+		BEGIN
+		INSERT INTO OA_DEVICES
+		(
+		ID,PACK,LISTNUM,FIRM,MODEL,RKTIME,DEPARTMENT)
+		VALUES
+		(#{id},#{pack},#{listnum},#{firm},#{model},
+		#{rktime},'5')
+		END
+		<!-- <foreach collection="list" item="item" index="index" separator="," 
+			> (#{item.id},#{item.pack},#{item.listnum},#{item.firm},#{item.model}, #{item.rktime},#{item.department}) 
+			</foreach> -->
+	</insert>
+	 <update id="editbyNum" parameterType="Devices">
+		UPDATE OA_DEVICES SET
+		state=#{state},ustate=#{ustate},carNumber=#{carNumber},installers=
+		#{installers},installtime=#{installtime}
+		WHERE listnum = #{listnum}
+	</update>
+<!-- 	<update id="editbyNum" parameterType="Devices">
+	UPDATE OA_DEVICES 
+	<set>  
+      <if test="state != null and state != ''">state = #{state},</if>  
+      <if test="state != null and state != ''">ustate = #{ustate},</if>  
+      <if test="carNumber != null and carNumber != ''">carNumber = #{carNumber},</if>  
+      <if test="installers != null and installers != ''">installers = #{installers},</if>  
+      <if test="installtime != null and installtime != ''">installtime = #{installtime}</if>  
+    </set> 
+		WHERE listnum = #{listnum}
+	</update> -->
+
+</mapper>

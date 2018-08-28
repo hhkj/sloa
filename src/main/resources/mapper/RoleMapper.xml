@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.slkj.sloa.Dao.RoleMapper">
+
+	<sql id="sql_temp">
+		ID,NAME,DSCRIPT,SORT
+	</sql>
+	<select id="getAll" resultType="Role" parameterType="hashmap">
+		SELECT
+		<include refid="sql_temp" />
+		FROM OA_ROLE
+	</select>
+	<select id="queryAll" resultType="Role" parameterType="hashmap">
+		SELECT
+		<include refid="sql_temp" />
+		FROM OA_ROLE
+	</select>
+
+	<delete id="deleteRole" parameterType="list">
+		DELETE FROM OA_ROLE WHERE
+		ID = #{id} AND ID != '1'
+	</delete>
+
+	<insert id="saveRole" parameterType="Role">
+		INSERT INTO
+		OA_ROLE(NAME,DSCRIPT,SORT )
+		VALUES(#{name}, #{dscript},#{sort} )
+	</insert>
+
+	<update id="editRole" parameterType="Role">
+		UPDATE OA_ROLE SET NAME =
+		#{name} ,DSCRIPT =#{dscript},SORT=#{sort}
+		WHERE ID = #{id}
+	</update>
+
+	<select id="queryByid" resultType="Role" parameterType="string">
+		SELECT
+		<include refid="sql_temp" />
+		FROM OA_ROLE WHERE ID= #{id}
+	</select>
+
+	<insert id="saveRoleRes" parameterType="hashmap">
+		INSERT INTO OA_ROLE_RES(ROLE_ID,MODULE_ID)
+		VALUES
+		<foreach collection="ids" item="item" index="index" separator=",">
+			(#{roleid}, #{item} )
+		</foreach>
+	</insert>
+	<delete id="deleteRoleRes" parameterType="hashmap">
+		DELETE FROM OA_ROLE_RES
+		WHERE ROLE_ID = #{roleid}
+	</delete>
+
+	<delete id="deleteRolePer" parameterType="hashmap">
+		DELETE FROM
+		OA_ROLE_PERMI WHERE ROLE_ID = #{roleid} AND MODULE_ID = #{modlueid}
+	</delete>
+	<insert id="saveRolePer" parameterType="hashmap">
+		INSERT INTO OA_ROLE_PERMI(role_id,module_id,permi_id)
+		VALUES
+		<foreach collection="ids" item="item" index="index" separator=",">
+			(#{roleid},#{modlueid}, #{item} )
+		</foreach>
+	</insert>
+</mapper>
