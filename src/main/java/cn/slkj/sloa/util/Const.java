@@ -17,7 +17,7 @@ public class Const {
 	public static final String SESSION_USERNAME = "USERNAME"; // 用户名
 	public static final String TRUE = "T";
 	public static final String FALSE = "F";
-	public static final String LOGIN = "/index.jsp"; // 登录地址
+	public static final String LOGIN = "/login/toLogin"; // 登录地址
 	public static final String SYSNAME = "config/SYSNAME.txt"; // 系统名称路径
 	public static final String PAGE = "config/PAGE.txt"; // 分页条数配置路径
 	public static final String EMAIL = "config/EMAIL.txt"; // 邮箱服务器配置路径

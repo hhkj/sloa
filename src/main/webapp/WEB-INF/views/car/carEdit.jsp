@@ -16,7 +16,7 @@
 <script type="text/javascript">
 	$(function() {
 		//加载下拉框中的内容 
-		loadCompanyBox('#companyName');
+		// 		loadCompanyBox('#companyName');
 		//解析url
 		var param = window.location.href;
 		//var reg = new RegExp("(^|&)" + param + "=([^&]*)(&|$)"); 
@@ -30,7 +30,7 @@
 		}
 		var id = ary[0];
 		loadCarInfo(id);
-
+		loadCompanyBox('#companyName');
 	});
 	function loadCarInfo(id) {
 		$.ajax({
@@ -40,19 +40,21 @@
 			cache : false,
 			success : function(data) {
 				$("#carForm").form('load', data);
-				$("input").attr("readonly", "readonly");
 			}
 		});
 	}
 	function submitForm() {
-		if ($("#postForm").form('enableValidation').form('validate')) {
+		if ($("#carForm").form('enableValidation').form('validate')) {
 			$.ajax({
-				url : '../vehicle/save',
+				url : '../vehicle/edit',
 				type : "POST",
-				data : $('#postForm').serialize(),
+				data : $('#carForm').serialize(),
 				success : function(result) {
 					if (result.success) {
-						$('#postForm').form('clear');
+						$('#carForm').form('clear');
+						parent.carDataGrid.datagrid('load');
+						var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+					    parent.layer.close(index); //再执行关闭
 					}
 					layer.msg(result.msg, {
 						time : 5000,
@@ -65,7 +67,7 @@
 	function clearForm() {
 		$('#carForm').form('clear');
 	}
-
+	
 	function loadCompanyBox(id) {
 		$(id).combogrid({
 			delay : 2000,
@@ -121,6 +123,7 @@
 <body>
 	<div class="form2-column">
 		<form id="carForm" class="easyui-form" method="post">
+		<input id="id" name="id" type="hidden" />
 			<div class="form-column2">
 				<div class="form-column-left">
 					<input class="easyui-textbox" name="carNumber" style="width: 100%" data-options="label:'车牌号:',required:true">
@@ -230,11 +233,15 @@
 			</div>
 			<div class="form-column1">
 				<div class="form-column-left">
-					<button class="layui-btn demoMore" lay-data="{url: '/a/', accept: 'images',size:1000}">查看车身45°照片</button>
-					<button class="layui-btn demoMore" lay-data="{url: '/b/', accept: 'images',size:1000}">查看车辆登记照片</button>
-					<button class="layui-btn demoMore" lay-data="{url: '/c/', accept: 'images',size:1000}">查看车辆登记照片2</button>
-					<button class="layui-btn demoMore" lay-data="{url: '/c/', accept: 'images',size:1000}">查看车辆合格证/登记证</button>
+					<button class="layui-btn demoMore" lay-data="{url: '/a/', accept: 'images',size:1000}">上传车身45°照片</button>
+					<button class="layui-btn demoMore" lay-data="{url: '/b/', accept: 'images',size:1000}">上传车辆登记照片</button>
+					<button class="layui-btn demoMore" lay-data="{url: '/c/', accept: 'images',size:1000}">上传车辆登记照片2</button>
+					<button class="layui-btn demoMore" lay-data="{url: '/c/', accept: 'images',size:1000}">上传车辆合格证/登记证</button>
 				</div>
+			</div>
+			<div class="form-column1 pl75">
+				<input type="submit" name="" value="保存" class="easyui-linkbutton btnPrimary" onclick="submitForm()" style="width: 80px" />
+				<input type="reset" name="" value="重置" class="easyui-linkbutton btnDefault" onclick="clearForm()" style="width: 80px" />
 			</div>
 		</form>
 	</div>

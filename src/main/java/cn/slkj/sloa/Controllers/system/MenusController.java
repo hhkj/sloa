@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -98,13 +99,67 @@ public class MenusController {
 		return toTree(list, "0");
 	}
 
+	/**
+	 * 根据id查询
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value = "/queryOne/{id}")
+	@ResponseBody
+	public Menus queryOne(@PathVariable String id) {
+		return menusServiceImpl.queryOne(id);
+	}
+
+	/**
+	 * 编辑菜单 or 按钮
+	 * 
+	 * @param module
+	 * @return
+	 */
+	@RequestMapping(value = "/editModule", method = { RequestMethod.POST })
+	@ResponseBody
+	public boolean editModule(Menus menus) {
+		int i = menusServiceImpl.update(menus);
+		if (i > 0) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	/**
+	 * 删除菜单
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value = "/delModule")
+	@ResponseBody
+	public boolean delModule(String id) {
+		Map<String, String> map = new HashMap<String, String>();
+		try {
+			int i = menusServiceImpl.delete(id);
+			if (i > 0) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	/* -------------------------------- */
+
 	private List<Tree> toTree(List<Menus> list, String code) {
 		List<Tree> trees = new ArrayList<Tree>();
 		for (Menus m : list) {
 			Tree t = new Tree();
 			t.setId(m.getMenuid() + "");
 			t.setText(m.getMenuname());
-			if (code.equals(m.getParentMenu()+"")) {
+			if (code.equals(m.getParentMenu() + "")) {
 				t.setChildren(toTree(list, m.getMenuid() + ""));
 				trees.add(t);
 			}

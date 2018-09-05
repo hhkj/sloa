@@ -6,7 +6,7 @@ var _menus;
 /*ajax获取菜单数据*/
 function loadModuleData() {
     $.ajax({
-    	url : "../menus/list",
+    	url : "menus/list",
         async: false,
         dataType: "json",
         cache: false,

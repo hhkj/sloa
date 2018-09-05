@@ -13,6 +13,9 @@
             <if test="equitment != null and equitment != ''">
                 AND TBV.EQUITMENT LIKE '%'+#{equitment}+'%'
             </if>
+            <if test="carVin != null and carVin != ''">
+                AND TBV.carVin LIKE '%'+#{carVin}+'%'
+            </if>
             <if test="companyId != null and companyId != ''">
                 AND TBV.COMPANYID = #{companyId}
             </if>
@@ -21,7 +24,7 @@
             </if>
             <if test="simNumber != null and simNumber != ''">
                 AND TBV.SIMNUMBER LIKE '%'+#{simNumber}+'%'
-            </if>            
+            </if> 
             <if test="companyName != null and companyName != ''">
                 AND TBC.COMPNAME   LIKE '%'+#{companyName}+'%'
             </if>

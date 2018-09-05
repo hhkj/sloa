@@ -1,19 +1,20 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%><c:set var="basePath" value="${pageContext.request.contextPath}" />
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>神龙智能办公</title>
-<link href="../assets/css/reset.css" rel="stylesheet" type="text/css" />
-<link href="../assets/js/themes/default/easyui.css" rel="stylesheet" type="text/css" />
-<link href="../assets/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
-<link href="../assets/css/layout.css" rel="stylesheet" type="text/css" />
+<link href="${basePath}/assets/css/reset.css" rel="stylesheet" type="text/css" />
+<link href="${basePath}/assets/js/themes/default/easyui.css" rel="stylesheet" type="text/css" />
+<link href="${basePath}/assets/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+<link href="${basePath}/assets/css/layout.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <body class="easyui-layout vui-easyui" scroll="no">
 	<noscript>
 		<div class="bowerPrompt" class="bowerPrompt">
-			<img src="../assets/images/noscript.gif" alt='抱歉，请开启脚本支持！' />
+			<img src="${basePath}/assets/images/noscript.gif" alt='抱歉，请开启脚本支持！' />
 		</div>
 	</noscript>
 	<!-- 头部 -->
@@ -89,11 +90,11 @@
 	</div>
 
 
-	<script src="../assets/js/jquery2.1.1.js" type="text/javascript"></script>
-	<script src="../assets/js/jquery.easyui.min.js" type="text/javascript"></script>
-	<script src='../assets/js/index2.js' type="text/javascript"></script>
-	<script src='../assets/js/system.menu2.js' type="text/javascript"></script>
-	<script src="../assets/js/easyui-lang-zh_CN.js" type="text/javascript"></script>
+	<script src="${basePath}/assets/js/jquery2.1.1.js" type="text/javascript"></script>
+	<script src="${basePath}/assets/js/jquery.easyui.min.js" type="text/javascript"></script>
+	<script src='${basePath}/assets/js/index2.js' type="text/javascript"></script>
+	<script src='${basePath}/assets/js/system.menu2.js' type="text/javascript"></script>
+	<script src="${basePath}/assets/js/easyui-lang-zh_CN.js" type="text/javascript"></script>
 	
 	<script type="text/javascript">
 		//绑定 div 的鼠标事件

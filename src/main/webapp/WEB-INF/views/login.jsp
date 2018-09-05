@@ -31,21 +31,22 @@
 						<!-- end -->
 						<div class="user_parent">
 							<div class="login_input user_bg unm">
-								<input name="username" id="username" tabindex="1" placeholder="账号" type="text" class="usernameSty" autocomplete="off">
+								<input name="username" id="username" tabindex="1" placeholder="账号" type="text" class="usernameSty" autocomplete="off" value="admin">
 							</div>
 						</div>
 
 						<div class="user_paswd">
 							<div class="login_input user_bg pwd" name="pwdParent" id="pwdParent">
 								<div id="newPwd" class="keyboards-box">
-									<input id="password" value="" type="password" name="password" tabindex="3" pa_ui_name="keyboard" pa_ui_keyboard_position="place" pa_ui_key_type="advance" class="styTextinput w162px" maxlength="20">
+									<input id="password" value="admin000" type="password" name="password" tabindex="3" pa_ui_name="keyboard" pa_ui_keyboard_position="place" pa_ui_key_type="advance" class="styTextinput w162px" maxlength="20">
 								</div>
 							</div>
 						</div>
 
 						<div style="height: 10px"></div>
 						<div class="remeber_name">
-							<b id="checked" class="normal" onclick="changeCheckRembername();"></b> <label id="login_save" style="float: left;">记住用户名</label>
+							<b id="checked" class="normal" onclick="changeCheckRembername();"></b>
+							<label id="login_save" style="float: left;">记住用户名</label>
 						</div>
 					</div>
 					<div class="login_ck">
@@ -75,7 +76,6 @@
 			}
 		}
 		if (window.top !== window.self) {
-			alert("123");
 			window.top.location = window.location;
 		}
 		document.onkeydown = function() {
@@ -101,7 +101,7 @@
 					cache : false,
 					success : function(data) {
 						if (data.success) {
-							window.location.href = "login/toIndex";
+							window.location.href = "toIndex";
 						} else {
 							alert("账号信息错误");
 							$("#username").focus();

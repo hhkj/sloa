@@ -52,6 +52,10 @@ public class VehicleController {
 	public String toInfoPage(HttpServletRequest request) {
 		return "/car/carInfo";
 	}
+	@RequestMapping("/vehicleEdit")
+	public String toEdiPage(HttpServletRequest request) {
+		return "/car/carEdit";
+	}
 	/**
 	 * 查询车辆列表，返回easyUI数据格式
 	 */
@@ -68,6 +72,7 @@ public class VehicleController {
 		String seasonExamE2 = request.getParameter("seasonExamE2");
 		String yearExamE1 = request.getParameter("yearExamE1");
 		String yearExamE2 = request.getParameter("yearExamE2");
+		String carVin = request.getParameter("carVin");
 		HashMap<String, Object> hashMap = new HashMap<String, Object>();
 		hashMap.put("carNumber", carNumber);
 		hashMap.put("companyName", companyName);
@@ -78,6 +83,7 @@ public class VehicleController {
 		hashMap.put("seasonExamE2", seasonExamE2);
 		hashMap.put("yearExamE1", yearExamE1);
 		hashMap.put("yearExamE2", yearExamE2);
+		hashMap.put("carVin", carVin);
 		User u = (User) session.getAttribute(Const.SESSION_USER);
 //		String depId = u.getDepartcode();
 //		hashMap.put("depId", depId);

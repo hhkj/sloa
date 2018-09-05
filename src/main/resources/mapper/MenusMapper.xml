@@ -2,17 +2,76 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.slkj.sloa.Dao.MenusMapper">
 	<sql id="sql_base">
-		 menuid,parentMenu,menuname,icon,url
+		menuid,parentMenu,menuname,icon,url
 	</sql>
 	<select id="queryAll" resultType="Menus" parameterType="hashmap">
 		SELECT
-			<include refid="sql_base"></include>
+		<include refid="sql_base"></include>
 		FROM TB_MENUS
+	</select>
+
+	<select id="queryOne" resultType="Menus" parameterType="string">
+		SELECT *
+		FROM TB_MENUS WHERE menuid =#{id}
 	</select>
 	<insert id="insert" parameterType="Menus">
 		INSERT INTO TB_MENUS
 		(parentMenu,menuname,icon,url)
 		VALUES(#{parentMenu},#{menuname},#{icon},#{url})
 	</insert>
+	<update id="update" parameterType="Menus">
+		UPDATE TB_MENUS SET
+		menuname=#{menuname} ,URL=#{url}, parentMenu=#{parentMenu},ICON=#{icon}
+		WHERE menuid =#{menuid}
+	</update>
 
+	<delete id="delete" parameterType="string">
+		DELETE FROM TB_MENUS WHERE
+		menuid = #{menuid}
+	</delete>
+
+	<select id="getModuleByUserId" parameterType="hashmap"
+		resultType="Menus">
+		SELECT DISTINCT TBM.* FROM TB_MENUS TBM ,OA_ROLE_RES TBRR WHERE
+		TBM.ID
+		= TBRR.MODULE_ID AND TBM.PRIORITY &lt; 3
+		<if test="userid != null and userid != ''">
+			AND TBRR.ROLE_ID = (SELECT roleId FROM OA_USER WHERE 1 = 1
+			AND
+			ID = #{userid} )
+		</if>
+		ORDER BY SORT
+	</select>
+
+	<select id="getModuleByRoleId" parameterType="hashmap"
+		resultType="Menus">
+		SELECT DISTINCT TBR.* FROM TB_MENUS TBR ,OA_ROLE_RES TBRR
+		WHERE TBR.ID
+		= TBRR.MODULE_ID
+		<if test="roleid != null and roleid != ''">
+			AND TBRR.ROLE_ID = #{roleid}
+		</if>
+		AND ID != '1'
+	</select>
+
+	<insert id="saveUserRes" parameterType="hashmap">
+		INSERT INTO OA_USER_MODULE(userid,resid)
+		VALUES
+		<foreach collection="ids" item="item" index="index" separator=",">
+			(#{userid}, #{item} )
+		</foreach>
+	</insert>
+
+	<select id="getRolePer" parameterType="hashmap" resultType="Menus">
+		SELECT DISTINCT TBR.* FROM TB_MENUS TBR ,OA_ROLE_RES TBRR
+		WHERE TBR.ID
+		= TBRR.MODULE_ID AND ID != '1' AND PRIORITY IN ('3' ,'4')
+		<if test="roleid != null and roleid != ''">
+			AND TBRR.ROLE_ID = #{roleid}
+		</if>
+		<if test="modlueid != null and modlueid != ''">
+			AND TBR.P_ID= #{modlueid}
+		</if>
+		ORDER BY sort
+	</select>
 </mapper>

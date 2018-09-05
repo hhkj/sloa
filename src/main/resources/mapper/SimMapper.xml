@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.slkj.sloa.Dao.SimMapper">
+
+	<resultMap id="recordResultMap" type="Sim">
+		<id column="simid" property="listnum" />
+		<result column="sum" property="business" />
+		<result column="jftime" property="renewtime" />
+		<result column="bz" property="beizhu" />
+	</resultMap>
+	<sql id="sql_base">
+		ID,FHTIME,REMARK,TELNUM,CARDTYPE,BUSINESS,LISTNUM,GYS,INTIME,OUTTIME,
+		KKTIME,RENEWTIME,BEIZHU,LYR,LRR,STATE,
+		DEPARTMENT,(SELECT D_NAME FROM
+		OA_DEPARTMENT WHERE ID = DEPARTMENT) AS DEPARTMENTNAME,
+		INSTALLERS,INSTALLTIME,CARNUMBER,COMPANYID, (SELECT COMPNAME FROM
+		OA_COMPANY WHERE ID = COMPANYID) AS COMPANYNAME,ustate
+	</sql>
+
+	<select id="getAll" resultType="Sim" parameterType="hashmap">
+		SELECT
+		<include refid="sql_base"></include>
+		FROM OA_SIM
+		<where>
+			<if test="telnum != null and telnum != ''">AND TELNUM LIKE '%'+#{telnum}+'%'</if>
+			<if test="state != null and state != ''">AND STATE = #{state} </if>
+			<if test="cardType != null and cardType != ''">AND CARDTYPE = #{cardType} </if>
+			<if test="lyr != null and lyr != ''">AND LYR LIKE '%'+#{lyr}+'%' </if>
+			<if test="department != null and department != ''">AND DEPARTMENT IN (SELECT ID FROM F_GETC( #{department}))
+			</if>
+			<if test="ustate != null and ustate != ''">AND USTATE =#{ustate}    </if>
+		</where>
+	</select>
+
+	<select id="getList" resultType="Sim" parameterType="hashmap">
+		<!-- SELECT * FROM OA_SIM WHERE STATE != 1 AND USTATE = 1 <if test="telnum 
+			!= null and telnum != ''">AND TELNUM LIKE '%'+#{telnum}+'%'</if> <if test="department 
+			!= null and department != ''">AND DEPARTMENT IN (SELECT ID FROM F_GETC( #{department})) 
+			</if> -->
+		SELECT
+		<include refid="sql_base"></include>
+		FROM OA_SIM
+		<where>
+			<if test="telnum != null and telnum != ''">AND TELNUM LIKE '%'+#{telnum}+'%'</if>
+			<if test="state != null and state != ''">AND STATE = #{state} </if>
+			<if test="cardType != null and cardType != ''">AND CARDTYPE = #{cardType} </if>
+			<if test="lyr != null and lyr != ''">AND LYR LIKE '%'+#{lyr}+'%' </if>
+			<if test="department != null and department != ''">AND DEPARTMENT IN (SELECT ID FROM F_GETC( #{department}))
+			</if>
+			<if test="ustate != null and ustate != ''">AND USTATE =#{ustate}    </if>
+		</where>
+	</select>
+	<insert id="insert" parameterType="Sim">
+
+		IF NOT EXISTS(SELECT * FROM
+		OA_SIM WHERE telnum = #{telnum})
+		BEGIN
+		INSERT INTO OA_SIM
+		(ID,LISTNUM,TELNUM,STATE,INTIME,OUTTIME,KKTIME,FHTIME,BEIZHU,
+		LYR,GYS,LRR,RENEWTIME,BUSINESS,REMARK,DEPARTMENT)
+		VALUES(#{id},#{listnum},#{telnum},#{state}, convert(varchar,
+		getdate(), 120),#{outtime},#{kktime},#{fhtime},#{beizhu},
+		#{lyr},#{gys},#{lrr},#{renewtime},#{business},#{remark},#{department})
+		END
+	</insert>
+
+	<select id="getCountByTelnum" resultType="int" parameterType="string">
+		SELECT COUNT(id) FROM OA_SIM where telnum=#{telnum}
+	</select>
+	<insert id="insertBatch" useGeneratedKeys="true" parameterType="java.util.List">
+		IF NOT EXISTS(SELECT * FROM OA_SIM WHERE telnum = #{telnum})
+		BEGIN
+		INSERT INTO OA_SIM
+		( ID,TELNUM,CARDTYPE,INTIME,DEPARTMENT)
+		VALUES
+		(#{id},#{telnum},#{cardType}, convert(varchar,getdate(),120), '5')
+		END
+		<!-- <foreach collection="list" item="item" index="index" separator="," 
+			> (#{item.id},#{item.telnum},#{item.cardType}, convert(varchar,getdate(),120), 
+			#{item.department}) </foreach> -->
+	</insert>
+	<update id="edit" parameterType="Sim">
+		UPDATE OA_SIM SET
+		ustate=#{ustate},state=#{state},telnum=#{telnum},lyr=#{lyr},
+		department=#{department},outtime=#{outtime},lrr=#{lrr},
+		remark=#{remark}
+		WHERE ID=#{id}
+	</update>
+	<update id="editPay" parameterType="Sim">
+		UPDATE OA_SIM SET
+		telnum=#{telnum},business=#{business},renewtime=#{renewtime},REMARK=#{remark}
+		WHERE ID=#{id}
+	</update>
+
+	<delete id="deletes" parameterType="list">
+		DELETE FROM OA_SIM WHERE ID in
+		<foreach item="ids" collection="array" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</delete>
+
+	<insert id="simPay" parameterType="Sim">
+		INSERT INTO OA_SIM_RECORD
+		(telnum,business,renewtime,operator,operatime)
+		VALUES(#{telnum},#{business},#{renewtime},#{operator},getdate())
+	</insert>
+
+	<select id="simPaylist" resultMap="recordResultMap"
+		parameterType="hashmap">
+		SELECT telnum,business ,renewtime,operator as lrr FROM
+		OA_SIM_RECORD WHERE
+		TELNUM =#{telnum}
+	</select>
+
+	<update id="use" parameterType="hashmap">
+		UPDATE OA_SIM set lyr=#{lyr},
+		outtime=#{outtime},ustate=#{ustate},remark =
+		#{remark},department=#{department}
+		WHERE ID IN
+		<foreach collection="ids" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	<update id="useByDevices" parameterType="hashmap">
+		UPDATE OA_SIM set lyr=#{lyr}, outtime=#{outtime},ustate=1,remark =
+		#{remark},department=#{department}
+		WHERE ID IN (
+		select simNumber from
+		OA_DEVICES where id
+		<foreach collection="ids" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+		)
+	</update>
+
+	<update id="editByNum" parameterType="Sim">
+		UPDATE OA_SIM SET
+		ustate=#{ustate},state=#{state},lyr=#{lyr},<!-- department=#{department}, -->outtime=#{outtime}
+		WHERE telnum=#{telnum}
+	</update>
+
+	<update id="revoke" parameterType="hashmap">
+		UPDATE OA_SIM set state=0,department=#{department} , ustate=0
+		WHERE ID
+		IN
+		<foreach collection="ids" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+</mapper>

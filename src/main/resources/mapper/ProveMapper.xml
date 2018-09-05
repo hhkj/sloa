@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.slkj.sloa.Dao.ProveMapper">
+	<sql id="sql_temp">
+		ID,UID,NUMBER,USTYPE,USMAN,USRIQI,WANGJIAN,INSPECTOR,RIQI,STATE,REMARK,USTATE,CARNUMBER,PURPOSE,
+		DEPARTMENT,(SELECT D_NAME FROM OA_DEPARTMENT WHERE ID = DEPARTMENT )
+		AS DEPARTMENTNAME,
+		amounts,startTime,endTime,fees,imgPath,payee,owner,ownerId,colAmounts,recycleTime
+	</sql>
+
+	<select id="getAll" resultType="prove" parameterType="hashmap">
+		SELECT
+		OAP.*, OAD.D_NAME AS DEPARTMENTNAME
+		FROM
+		OA_PROVE OAP,
+		OA_DEPARTMENT OAD
+
+		<where>
+			OAP.DEPARTMENT = OAD.ID
+			<if test="number != null and number != ''">AND OAP.NUMBER like '%'+#{number}+'%'</if>
+			<if test="department != null and department != ''">AND OAD.ID IN (SELECT ID FROM F_GETC( #{department}))
+			</if>
+			<if test="usman != null and usman != ''"> AND OAP.USMAN LIKE '%'+#{usman}+'%'</if>
+			<if test="endDate != null and endDate != ''">AND OAP.RIQI >= #{endDate} </if>
+			<if test="endDate1 != null and endDate1 != ''"> OAP.AND RIQI &lt;= #{endDate1} </if>
+			<if test="state != null and state != ''">AND OAP.STATE = #{state} </if>
+			<if test="ustate != null and ustate != ''">AND OAP.USTATE = #{ustate} </if>
+			<if test="ustype != null and ustype != ''">AND OAP.USTYPE = #{ustype} </if>
+			<if test="startTime != null and startTime != ''">AND OAP.riqi >=#{startTime} </if>
+			<if test="endTime != null and endTime != ''">AND OAP.riqi &lt;= #{endTime} </if>
+			<if test="fees != null and fees != ''">AND OAP.FEES = #{fees} </if>
+			<if test="carNumber != null and carNumber != ''">AND OAP.CARNUMBER LIKE '%'+#{carNumber}+'%'</if>
+
+		</where>
+	</select>
+	<select id="getList" resultType="prove" parameterType="hashmap">
+		SELECT
+		OAP.*, OAD.D_NAME AS DEPARTMENTNAME
+		FROM
+		OA_PROVE OAP,
+		OA_DEPARTMENT OAD
+		<where>
+			OAP.DEPARTMENT = OAD.ID
+			<if test="number != null and number != ''">AND OAP.NUMBER like '%'+#{number}+'%'</if>
+			<if test="department != null and department != ''">AND OAD.ID IN (SELECT ID FROM F_GETC( #{department}))
+			</if>
+			<if test="usman != null and usman != ''"> AND OAP.USMAN LIKE '%'+#{usman}+'%'</if>
+			<if test="endDate != null and endDate != ''">AND OAP.RIQI >= #{endDate} </if>
+			<if test="endDate1 != null and endDate1 != ''"> OAP.AND RIQI &lt;= #{endDate1} </if>
+			<if test="state != null and state != ''">AND OAP.STATE = #{state} </if>
+			<if test="ustate != null and ustate != ''">AND OAP.USTATE = #{ustate} </if>
+			<if test="ustype != null and ustype != ''">AND OAP.USTYPE = #{ustype} </if>
+			<if test="startTime != null and startTime != ''">AND OAP.riqi >=#{startTime} </if>
+			<if test="endTime != null and endTime != ''">AND OAP.riqi &lt;= #{endTime} </if>
+			<if test="fees != null and fees != ''">AND OAP.FEES = #{fees} </if>
+			<if test="carNumber != null and carNumber != ''">AND OAP.CARNUMBER LIKE '%'+#{carNumber}+'%'</if>
+
+		</where>
+	</select>
+	<select id="queryOne" parameterType="prove" resultType="prove">
+		SELECT
+		<include refid="sql_temp" />
+		from OA_PROVE
+		<where>
+			<if test="id != null and id != ''">
+				AND id = #{id}
+			</if>
+		</where>
+	</select>
+	<insert id="save" parameterType="prove">
+		IF NOT EXISTS(SELECT * FROM
+		OA_PROVE WHERE NUMBER = #{number} AND USTYPE
+		= #{ustype})
+		BEGIN
+		INSERT
+		INTO OA_PROVE
+		(id,uid,number,ustype,state,remark,department)
+		VALUES
+		(#{id},#{uid},#{number},#{ustype},0,#{remark},#{department})
+		END
+	</insert>
+
+	<!-- <select id="getCountByNumber" resultType="int" parameterType="hashmap"> 
+		SELECT COUNT(id) FROM OA_PROVE where number=#{number} and ustype=#{ustype} 
+		</select> -->
+	<insert id="insertBatch" useGeneratedKeys="true" parameterType="java.util.List">
+		IF NOT EXISTS(SELECT * FROM OA_PROVE WHERE NUMBER = #{number} AND
+		USTYPE = #{ustype})
+		BEGIN
+		INSERT INTO OA_PROVE
+		(
+		ID,NUMBER,USTYPE,RIQI,DEPARTMENT)
+		VALUES
+		(#{id},#{number},#{ustype},
+		convert(varchar,getdate(), 120), '5')
+		END
+		<!-- <foreach collection="list" item="item" index="index" separator="," 
+			> (#{item.id},#{item.number},#{item.ustype}, convert(varchar,getdate(), 120), 
+			#{item.department}) </foreach> -->
+	</insert>
+	<update id="edit" parameterType="prove">
+		UPDATE OA_PROVE set
+		ustate =
+		#{ustate},ustype=#{ustype},number=#{number},state = #{state},
+		usriqi=#{usriqi},department=#{department}, usman=#{usman},
+		purpose =#{purpose},carNumber=#{carNumber},remark=#{remark},fees =
+		#{fees},payee=#{payee}
+		where
+		id = #{id}
+	</update>
+	<update id="use" parameterType="hashmap">
+		UPDATE OA_PROVE set usman=#{usman},
+		usriqi=#{usriqi},state=#{state},remark =
+		#{remark},department=#{department}
+		WHERE ID IN
+		<foreach collection="ids" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<update id="revoke" parameterType="hashmap">
+		UPDATE OA_PROVE set usman='',
+		usriqi='',state=0,department=#{department} ,
+		carnumber='',
+		ustate='',
+		startTime='',
+		endTime='',
+		fees = '0',
+		purpose ='',
+		remark =''
+		WHERE ID IN
+		<foreach collection="ids" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+
+	<update id="tovoid" parameterType="hashmap">
+		UPDATE OA_PROVE SET STATE=#{state} ,recycleTime ="#{recycleTime}"
+		WHERE ID IN
+		<foreach collection="ids" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	<update id="canceled" parameterType="hashmap">
+		UPDATE OA_PROVE SET USTATE=#{ustate} WHERE ID IN
+		<foreach collection="ids" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<delete id="delete" parameterType="string">
+		DELETE FROM OA_PROVE WHERE
+		ID =
+		#{id}
+	</delete>
+
+	<update id="billing" parameterType="hashmap">
+		UPDATE OA_PROVE SET
+		PURPOSE=#{purpose},CARNUMBER=#{carNumber},RIQI=#{riqi},
+		REMARK=#{remark},INSPECTOR=#{inspector},USTATE='1',colAmounts=#{colAmounts},
+		startTime=#{startTime},endTime=#{endTime},owner=#{owner},ownerId=#{ownerId}
+		WHERE ID = #{id}
+	</update>
+	<update id="fees" parameterType="hashmap">
+		UPDATE OA_PROVE SET FEES =
+		1,PAYEE=#{payee},amounts=#{amounts} WHERE ID =
+		#{id}
+	</update>
+
+	<update id="updateImg" parameterType="hashmap">
+		UPDATE OA_PROVE SET IMGPATH
+		= #{filename} WHERE USTYPE=#{type} AND
+		NUMBER=#{number}
+	</update>
+	<insert id="insert_recordList" parameterType="map">
+		INSERT OA_PROVE_RECORD (prove_id, site, cktime, lydepartment, lyr,
+		qsstate, qsr, qstime, ustate, remark)
+		SELECT
+		id,#{site},usriqi,DEPARTMENT,usman,#{qsstate},#{qsr},#{qstime},state,REMARK
+		FROM OA_PROVE A WHERE A.ID IN
+		<foreach item="ids" collection="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</insert>
+
+
+	<select id="getListRecd" resultType="Prove_record"
+		parameterType="hashmap">
+		SELECT (SELECT d_name FROM oa_department WHERE id=site)
+		as site, cktime, lydepartment, lyr, qsstate, qsr, qstime,
+		ustate,
+		remark,(SELECT D_NAME FROM OA_DEPARTMENT WHERE ID =
+		lydepartment) AS
+		departmentname
+		FROM oa_prove_record WHERE prove_id =#{listnum} ORDER BY
+		cktime DESC
+	</select>
+</mapper>

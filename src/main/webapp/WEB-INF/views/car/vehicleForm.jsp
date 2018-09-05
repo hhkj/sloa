@@ -11,51 +11,133 @@
 <script src="../assets/js/jquery2.1.1.js" type="text/javascript"></script>
 <script src="../assets/js/jquery.easyui.min.js" type="text/javascript"></script>
 <script src="../assets/js/easyui-lang-zh_CN.js" type="text/javascript"></script>
-</head>
+<script src="../assets/js/layer.js" type="text/javascript"></script>
+<link rel="stylesheet" href="../assets/css/layui.css" media="all">
+<script type="text/javascript">
+	$(function() {
+		//加载下拉框中的内容 
+		loadCompanyBox('#companyName');
+		// 		loadEquipmentBox('#equitment1');
+		// 		loadSimBox('#simNumber1');
+	});
+	function loadCompanyBox(id) {
+		$(id).combogrid({
+			delay : 2000,
+			required : true,
+			panelWidth : 500,
+			idField : 'id',
+			textField : 'compName',
+			url : '../company/list',
+			loadMsg : '数据加载中,请稍后……',
+			onChange : function(newValue, oldValue) {
+				artChanged = true;//记录是否有改变（当手动输入时发生)
+			},
+			columns : [ [ {
+				field : 'compName',
+				title : '公司名称',
+				width : 80
+			}, {
+				field : 'contactMenber',
+				title : '联系人',
+				width : 30
+			}, {
+				field : 'contactWay',
+				title : '联系方式',
+				width : 30
+			} ] ],
+			fitColumns : true,
+			pagination : true,
+			pageSize : 20,
+			keyHandler : {
+				up : function() {
+				},
+				down : function() {
+				},
+				enter : function() {
+				},
+				query : function(q) {
+					//动态搜索
+					$(this).combogrid('grid').datagrid('reload', {
+						'compName' : q
+					});
+					$(this).combogrid('setValue', q);
+				}
+			},
+			onSelect : function(index, row) {
+				selectRow = row;
+				//$('#deviceId').textbox('setValue', row.equitment);
+				$("#companyId").val(row.id);
+			}
+		});
+	}
+	function submitForm() {
+		$.ajax({
+			url : '../vehicle/save',
+			type : "POST",
+			data : $('#postForm').serialize(),
+			success : function(result) {
+				if (result.success) {
+					$('#postForm').form('clear');
+				}
+				layer.msg(result.msg, {
+					time : 5000,
+					icon : 6
+				});
+			}
+		});
 
+	}
+	function clearForm() {
+		$('#postForm').form('clear');
+	}
+</script>
+</head>
 <body>
 	<div class="form-wrapper" id="form-wrapper">
 		<div class="form2-column">
 			<h3 class="form-title">车辆信息</h3>
-			<form id="vui_sample" class="easyui-form" method="post">
+			<form id="postForm" class="easyui-form" method="post">
 				<div class="form-column2">
 					<div class="form-column-left">
-						<input class="easyui-textbox" name="carPlateNo" style="width: 100%" data-options="label:'车牌号:',required:true">
+						<input class="easyui-textbox" name="carNumber" style="width: 100%" data-options="label:'车牌号:',required:true">
 					</div>
 					<div class="form-column-left fm-left">
-						<select class="easyui-combobox" name="carPlateCol" data-options="label:'车牌颜色:',required:true" labelPosition="top" style="width: 100%;">
-							<option value="Y">黄色</option>
-							<option value="U">蓝色</option>
-							<option value="B">黑色</option>
-							<option value="W">白色</option>
-							<option value="O">其他</option>
+						<select class="easyui-combobox" name="plateColor" data-options="label:'车牌颜色:',required:true" labelPosition="top" style="width: 100%;">
+							<option value="1">黄色</option>
+							<option value="0">蓝色</option>
+							<option value="2">黑色</option>
+							<option value="3">白色</option>
 						</select>
 					</div>
 				</div>
 				<div class="form-column2">
 					<div class="form-column-left">
-						<select class="easyui-combobox" name="customerName" data-options="label:'所属企业:'" labelPosition="top" style="width: 100%;">
-							<option value="燃油车">燃油车</option>
-							<option value="双燃料">双燃料</option>
-							<option value="新能源">新能源</option>
-						</select>
+						<select class="easyui-combobox" name="carType" id="carType" labelPosition="top" style="width: 100%;" data-options="label:'车辆类型:',valueField:'value',textField:'value',required:true,
+											url:'../data/VEHICLE_TYPE.json'"></select>
 					</div>
 					<div class="form-column-left fm-left">
-						<select class="easyui-combobox" name="carBrand" id="carBrand" labelPosition="top" style="width: 100%;" data-options="label:'车辆品牌:',valueField:'key',textField:'value',required:true,
-											url:'../assets/json/VEHICLE_TYPE.json'"></select>
+						<input class="easyui-textbox" name="carBrand" style="width: 100%" data-options="label:'车辆品牌:'">
 					</div>
 				</div>
 				<div class="form-column2">
 					<div class="form-column-left">
-						<input class="easyui-textbox" name="carOwner" style="width: 100%" data-options="label:'联系人:',required:true">
+						<input id="companyName" name="companyId" class="easyui-textbox" data-options="label:'所属企业:'" labelPosition="top" style="width: 100%;" />
 					</div>
 					<div class="form-column-left fm-left">
-						<input class="easyui-textbox" name="carOwnerTel" style="width: 100%" data-options="label:'联系电话:',required:true">
+						<input class="easyui-textbox" name="carOwner" style="width: 100%" data-options="label:'车主:',required:true">
 					</div>
 				</div>
 				<div class="form-column2">
 					<div class="form-column-left">
-						<input class="easyui-textbox" name="vin2" style="width: 100%" data-options="label:'车辆识别代码/车架号:',required:true">
+						<input class="easyui-textbox" name="contacts" style="width: 100%" data-options="label:'联系人:',required:true">
+					</div>
+					<div class="form-column-left fm-left">
+						<input class="easyui-textbox" name="contactsTel" style="width: 100%" data-options="label:'联系电话:',required:true">
+					</div>
+				</div>
+				<div class="form-column2">
+					<div class="form-column-left">
+						<input class="easyui-textbox" name="carVin" style="width: 100%" data-options="label:'车辆识别代码/车架号:',required:true">
 					</div>
 					<div class="form-column-left fm-left">
 						<input class="easyui-textbox" name="carColor" style="width: 100%" data-options="label:'车身颜色:',required:true">
@@ -63,22 +145,76 @@
 				</div>
 				<div class="form-column2">
 					<div class="form-column-left">
-						<input class="easyui-textbox" name="sqkf" style="width: 100%" data-options="label:'营运证号:'">
+						<input class="easyui-textbox" name="carModel" style="width: 100%" data-options="label:'车辆型号:'">
 					</div>
 					<div class="form-column-left fm-left">
-						<input class="easyui-textbox" name="transportNo" style="width: 100%" data-options="label:'行驶证初次登记:'">
+						<input class="easyui-textbox" name="factory" style="width: 100%" data-options="label:'制造厂名称:'">
 					</div>
 				</div>
 				<div class="form-column2">
 					<div class="form-column-left">
-						<input class="easyui-textbox" name="vehicleModel" style="width: 100%" data-options="label:'车辆型号:'">
+						<!-- 												<input class="easyui-textbox" name="vehicleModel" style="width: 60px" data-options="label:'外廓尺寸:mm'"> -->
+						外廓尺寸:mm
+						<input name="carOutLength" style="width: 60px;">
+						X
+						<input name="carOutWidth" style="width: 60px;">
+						X
+						<input name="carOutHeight" style="width: 60px;">
 					</div>
 					<div class="form-column-left fm-left">
-						<input class="easyui-textbox" id="storage-time" name="hgzDataSource" style="width: 100%" data-options="label:'汽车制造厂:'">
+						<!-- 						<input class="easyui-textbox" id="storage-time" name="hgzDataSource" style="width: 100%" data-options="label:'货箱内部尺寸:mm'"> -->
+						货箱内部尺寸:mm
+						<input name="carContLength" style="width: 60px;">
+						X
+						<input name="carContWidth" style="width: 60px;">
+						X
+						<input name="carContHeight" style="width: 60px;">
 					</div>
 				</div>
+				<div class="form-column2">
+					<div class="form-column-left">
+						<input class="easyui-textbox" name="carTotalmass" style="width: 100%" data-options="label:'总质量:'">
+					</div>
+					<div class="form-column-left fm-left">
+						<input class="easyui-textbox" name="carTrac" style="width: 100%" data-options="label:'准牵引总质量:'">
+					</div>
+				</div>
+				<div class="form-column2">
+					<div class="form-column-left">
+						<input class="easyui-textbox" name="carApproved" style="width: 100%" data-options="label:'核定质量:'">
+					</div>
+					<div class="form-column-left fm-left">
+						<input class="easyui-textbox" name="carApprGuest" style="width: 100%" data-options="label:'核定载客:'">
+					</div>
+				</div>
+				<h3 class="form-title">入网信息</h3>
+				<div class="form-column2">
+					<div class="form-column-left">
+						<input class="easyui-textbox" name="equitment" style="width: 100%" data-options="label:'设备编号:'">
+					</div>
+					<div class="form-column-left fm-left">
+						<input class="easyui-textbox" name="simNumber" style="width: 100%" data-options="label:'SIM卡号:'">
+					</div>
+				</div>
+				<div class="form-column2">
+					<div class="form-column-left">
+						<input class="easyui-textbox" name="installers" style="width: 100%" data-options="label:'安装人:'">
+					</div>
+					<div class="form-column-left fm-left">
+						<input class="easyui-datebox" name="installtime" style="width: 100%" data-options="label:'安装时间:'">
+					</div>
+				</div>
+				<!-- 				<div class="form-column1"> -->
+				<!-- 					<div class="form-column-left"> -->
+				<!-- 						<button class="layui-btn demoMore" lay-data="{url: '/a/', accept: 'images',size:1000}">上传车身45°照片</button> -->
+				<!-- 						<button class="layui-btn demoMore" lay-data="{url: '/b/', accept: 'images',size:1000}">上传车辆登记照片</button> -->
+				<!-- 						<button class="layui-btn demoMore" lay-data="{url: '/c/', accept: 'images',size:1000}">上传车辆登记照片2</button> -->
+				<!-- 						<button class="layui-btn demoMore" lay-data="{url: '/c/', accept: 'images',size:1000}">上传车辆合格证/登记证</button> -->
+				<!-- 					</div> -->
+				<!-- 				</div> -->
 				<div class="form-btnBar pl75">
-					<input type="submit" name="" value="保存" class="easyui-linkbutton btnPrimary" onclick="submitForm()" style="width: 80px" /> <input type="reset" name="" value="重置" class="easyui-linkbutton btnDefault" onclick="clearForm()" style="width: 80px" />
+					<input type="submit" name="" value="保存" class="easyui-linkbutton btnPrimary" onclick="submitForm()" style="width: 80px" />
+					<input type="reset" name="" value="重置" class="easyui-linkbutton btnDefault" onclick="clearForm()" style="width: 80px" />
 				</div>
 			</form>
 		</div>

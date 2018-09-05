@@ -16,6 +16,11 @@
 		<typeAlias alias="Vehicle" type="cn.slkj.sloa.Entity.Vehicle" />
 		<typeAlias alias="Devices" type="cn.slkj.sloa.Entity.Devices" />
 		<typeAlias alias="Devices_record" type="cn.slkj.sloa.Entity.Devices_record" />
+		<typeAlias alias="Prove" type="cn.slkj.sloa.Entity.stock.Prove" />
+		<typeAlias alias="Prove_record" type="cn.slkj.sloa.Entity.stock.Prove_record" />
+		<typeAlias alias="Sim" type="cn.slkj.sloa.Entity.stock.Sim" />
+		
+		<typeAlias alias="Company" type="cn.slkj.sloa.Entity.system.Company" />
 	</typeAliases>
 	<plugins>
 		<plugin interceptor="com.github.miemiedev.mybatis.paginator.OffsetLimitInterceptor">
