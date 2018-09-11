@@ -17,6 +17,14 @@ public class Menus {
 	private String menuname;
 	private Integer parentMenu;
 	private String url;
+	private Integer sort;
+	
+	public Integer getSort() {
+		return sort;
+	}
+	public void setSort(Integer sort) {
+		this.sort = sort;
+	}
 	public Integer getMenuid() {
 		return menuid;
 	}
@@ -49,7 +57,7 @@ public class Menus {
 	}
 	@Override
 	public String toString() {
-		return "Menus [menuid=" + menuid + ", icon=" + icon + ", menuname=" + menuname + ", parentMenu=" + parentMenu + ", url=" + url + ", getMenuid()=" + getMenuid() + ", getIcon()=" + getIcon() + ", getMenuname()=" + getMenuname() + ", getParentMenu()=" + getParentMenu() + ", getUrl()=" + getUrl() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
+		return "Menus [menuid=" + menuid + ", icon=" + icon + ", menuname=" + menuname + ", parentMenu=" + parentMenu + ", url=" + url + ", sort=" + sort + "]";
 	}
 
 	 

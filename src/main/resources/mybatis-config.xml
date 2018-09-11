@@ -21,6 +21,8 @@
 		<typeAlias alias="Sim" type="cn.slkj.sloa.Entity.stock.Sim" />
 		
 		<typeAlias alias="Company" type="cn.slkj.sloa.Entity.system.Company" />
+		<typeAlias alias="Fees" type="cn.slkj.sloa.Entity.shfw.Fees" />
+		<typeAlias alias="PayFees" type="cn.slkj.sloa.Entity.shfw.PayFees" />
 	</typeAliases>
 	<plugins>
 		<plugin interceptor="com.github.miemiedev.mybatis.paginator.OffsetLimitInterceptor">

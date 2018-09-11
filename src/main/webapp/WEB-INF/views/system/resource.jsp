@@ -57,6 +57,11 @@
 				</div>
 				<div class="form-column1">
 					<div class="form-column-left">
+						<input class="easyui-numberbox" name="sort" style="width: 100%" data-options="label:'排序:'">
+					</div>
+				</div>
+				<div class="form-column1">
+					<div class="form-column-left">
 						<input class="easyui-textbox" name="icon" style="width: 100%" data-options="label:'资源图标:',required:true">
 					</div>
 				</div>
@@ -123,7 +128,13 @@
 					field : 'icon',
 					title : '资源图标',
 					width : '10%'
-				} ] ]
+				}, {
+					field : 'sort',
+					title : '排序'
+				} ] ],
+				onLoadSuccess : function() {
+					$('#function_tb').treegrid('collapseAll');
+				}
 			});
 		}
 		function submitForm() {
@@ -192,15 +203,15 @@
 			//按钮
 			}, function(index) {
 				var data = dataGrid.datagrid('getSelected');
-// 				$.ajax({
-// 					url : "../vehicle/delete?id=" + data.id,
-// 					success : function(data) {
-// 						if (data) {
-// 							carDataGrid.datagrid('load');
-// 							layer.close(index);
-// 						}
-// 					}
-// 				});
+				// 				$.ajax({
+				// 					url : "../vehicle/delete?id=" + data.id,
+				// 					success : function(data) {
+				// 						if (data) {
+				// 							carDataGrid.datagrid('load');
+				// 							layer.close(index);
+				// 						}
+				// 					}
+				// 				});
 			});
 		}
 	</script>

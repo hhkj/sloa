@@ -190,7 +190,6 @@
 					</a>
 				</div>
 				<table id="carDataGrid" class="table table-fixed table-dotted table-hover "></table>
-				<table class="layui-hide" id="test"></table>
 			</div>
 		</div>
 	</div>

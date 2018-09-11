@@ -151,6 +151,45 @@ public class MenusController {
 			return false;
 		}
 	}
+
+	@RequestMapping(value = "/role2Module")
+	@ResponseBody
+	public List<Tree> role2Module(String roleId) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("roleid", roleId);
+		List<Menus> allList = menusServiceImpl.queryAll(map);
+		 List<Menus> checkList = menusServiceImpl.getModuleByRoleId(map);
+		 return initCheckBoxTree(allList, "0", checkList);
+	}
+
+	// 将list转换为需要的json格式
+	private List<Tree> initCheckBoxTree(List<Menus> list, String id, List<Menus> list1) {
+		List<Tree> trees = new ArrayList<Tree>();
+		for (Menus menus : list) {
+			Tree node = new Tree();
+			node.setId(menus.getMenuid()+"");
+			node.setText(menus.getMenuname());
+//			if (list1 != null) {
+//				// 循环判断该角色拥有的资源，如果拥有的话，设置为选择中
+//				for (int i = 0; i < list1.size(); i++) {
+//					String oid = list1.get(i).getId();
+//					String nid = menus.getId();
+//					if (oid.equals(nid)) {
+//						node.setChecked(true);
+//					}
+//				}
+//			}
+			if (id.equals(menus.getParentMenu()+"")) {
+				node.setChildren(initCheckBoxTree(list, node.getId(), list1));
+				if (!node.getChildren().isEmpty()) {
+					node.setChecked(false);
+				}
+
+				trees.add(node);
+			}
+		}
+		return trees;
+	}
 	/* -------------------------------- */
 
 	private List<Tree> toTree(List<Menus> list, String code) {
@@ -201,6 +240,7 @@ public class MenusController {
 				map.put("name", menus.getMenuname());
 				map.put("url", menus.getUrl());
 				map.put("icon", menus.getIcon());
+				map.put("sort", menus.getSort());
 				map.put("children", createTreeGridChildren(list, menus.getMenuid()));
 			}
 			if (map != null) {
@@ -228,6 +268,7 @@ public class MenusController {
 				map.put("name", treeChild.getMenuname());
 				map.put("url", treeChild.getUrl());
 				map.put("icon", treeChild.getIcon());
+				map.put("sort", treeChild.getSort());
 				map.put("children", createTreeGridChildren(list, treeChild.getMenuid()));
 			}
 
@@ -296,5 +337,4 @@ public class MenusController {
 		return childList;
 
 	}
-
 }

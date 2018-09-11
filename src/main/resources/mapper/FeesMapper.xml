@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.slkj.sloa.Dao.FeesMapper">
+	<sql id="sql_temp">
+		id,purpose,carNumber,owner,number,startTime,endTime,colAmounts,riqi,agent,depCode,
+		(select d_name from oa_department where id = depCode)as
+		depName,fees,amounts,sriqi,payee,remark,inspector,sf_time ,qr_time,deviceNumber,devicePice,simNumber,simPice,upkeep,upkeepPice
+	</sql>
+	<sql id="s_temp">
+		id,purpose,oaf.carNumber,owner,number,startTime,oaf.endTime,colAmounts,riqi,agent,depCode,
+		(select d_name from oa_department where id = depCode)as
+		depName,fees,amounts,sriqi,payee,remark,inspector,sf_time,qr_time
+	</sql>
+	
+	<sql id="sql_payFees">
+		id,carNumber,owner,fees,sfry,sfriqi,initriqi ,startTime,endTime,purpose,companyName,ownerTel,remark
+	</sql>
+
+	<select id="getFeesByCarNum" resultType="Vehicle" parameterType="hashmap">
+		SELECT TBV.*, TBC.COMPNAME AS COMPANYNAME,OFE.NUMBER AS NETWORKNO,OFE.ENDTIME AS FEESEEND
+        FROM OA_VEHICLE TBV 
+        LEFT JOIN OA_COMPANY TBC ON TBV.COMPANYID = TBC.ID
+        LEFT JOIN (SELECT OE.* ,OA_FEES.NUMBER FROM (SELECT CARNUMBER,MAX(ENDTIME)AS ENDTIME FROM OA_FEES        
+         GROUP BY CARNUMBER)OE,oa_fees WHERE OE.carNumber=oa_fees.carNumber AND OE.ENDTIME=oa_fees.endTime
+         
+         )OFE 
+        ON TBV.CARNUMBER = OFE.CARNUMBER 
+      
+        <where>            
+            <if test="carNumber != null and carNumber != ''">
+                AND TBV.CARNUMBER = #{carNumber}
+            </if>
+             
+        </where>
+	</select>
+	<select id="listByCarNumber" resultType="Fees" parameterType="hashmap">
+		SELECT
+		<include refid="sql_temp" />
+		FROM OA_FEES
+		<where>
+			<if test="carNumber != null  and carNumber != ''">
+				AND CARNUMBER LIKE '%'+#{carNumber}+'%'
+			</if>
+			<if test="number != null  and number != ''">
+				AND number LIKE '%'+#{number}+'%'
+			</if>
+			<if test="endTime != null  and endTime != ''">
+				AND endTime &gt;= #{endTime}
+			</if>
+			<if test="endTime1 != null  and endTime1 != ''">
+				AND endTime &lt;= #{endTime1}
+			</if>
+			<if test="purpose != null  and purpose != ''">
+				AND purpose = #{purpose}
+			</if>
+			<if test="depId != null and depId != ''">
+				AND DEPCODE IN (SELECT ID FROM F_GETC( #{depId}))
+			</if>
+		</where>
+	</select>
+
+	<select id="getAll" resultType="Fees" parameterType="hashmap">
+		SELECT
+		<include refid="s_temp" />
+		FROM OA_FEES oaf,
+		(
+		SELECT
+		carNumber,
+		MAX (endTime) AS endTime
+		FROM
+		oa_fees
+		GROUP BY
+		oa_fees.carNumber
+		) AS OFEE
+		<where>
+			oaf.carNumber = OFEE.carNumber
+			AND oaf.endTime = OFEE.endTime
+
+			<if test="carNumber != null  and carNumber != ''">
+				AND oaf.CARNUMBER LIKE '%'+#{carNumber}+'%'
+			</if>
+			<if test="depId != null and depId != ''">
+				AND DEPCODE IN (SELECT ID FROM F_GETC( #{depId}))
+			</if>
+			<if test="endTime != null  and endTime != ''">
+				AND oaf.endTime &gt;= #{endTime}
+			</if>
+			<if test="endTime1 != null  and endTime1 != ''">
+				AND oaf.endTime &lt;= #{endTime1}
+			</if>
+			
+			<if test="riqi != null  and riqi != ''">
+				AND oaf.riqi &gt;= #{riqi}
+			</if>
+			<if test="riqi1 != null  and riqi1 != ''">
+				AND oaf.riqi &lt;= #{riqi1}
+			</if>
+			
+			
+			<if test="purpose != null  and purpose != ''">
+				AND purpose = #{purpose}
+			</if>
+			<if test="fees != null  and fees != ''">
+				AND fees = #{fees}
+			</if>
+			<if test="number != null  and number != ''">
+				AND number LIKE '%'+#{number}+'%'
+			</if>
+
+		</where>
+	</select>
+
+	<select id="queryOne" resultType="Fees" parameterType="string">
+		SELECT *
+		FROM OA_FEES WHERE ID =#{id}
+	</select>
+	<select id="getCarFeesByWx" resultType="Fees" parameterType="hashmap">
+		SELECT
+			top 1   y.id,y.carNumber,y.owner,y.startTime,y.endTime,y.colAmounts
+		FROM
+			oa_fees y,
+			(
+				SELECT
+					carNumber,
+					MAX (endtime) endtime
+				FROM
+					oa_fees
+					
+					<where>
+					carNumber = #{carNumber}
+						<if test="endTime != null  and endTime != ''">
+							AND  CONVERT (VARCHAR(7), endTime, 120) = CONVERT (VARCHAR(7), #{endTime}, 120)
+						</if>
+						<if test="phone != null and phone != ''">
+							AND phone = #{phone}
+						</if>
+					</where>
+				GROUP BY
+					carNumber
+			) x
+		WHERE
+			y.carNumber = x.carNumber
+		AND y.endtime = x.endtime
+		ORDER BY riqi desc
+	</select>
+
+	<insert id="insert" parameterType="Fees">
+	</insert>
+
+	<update id="update" parameterType="Fees">
+	</update>
+
+	<delete id="delete" parameterType="string">
+		DELETE FROM OA_FEES WHERE ID =
+		#{id}
+	</delete>
+
+	<update id="fees" parameterType="hashmap">
+		UPDATE OA_FEES SET FEES =1,
+		PAYEE=#{payee},amounts=#{amounts},sriqi=#{sriqi} ,qr_time
+		=CONVERT(varchar(100), GETDATE(), 20)
+		WHERE ID = #{id}
+	</update>
+	<insert id="pay" parameterType="hashmap">
+		INSERT INTO OA_FEES
+		(id,purpose,carNumber,owner,number,startTime,endTime,colAmounts,riqi,agent,depCode,remark,caruid,inspector,sf_time,deviceNumber,devicePice,simNumber,simPice,upkeep,upkeepPice)
+		VALUES
+		(#{id},#{purpose},#{carNumber},#{owner},#{number},#{startTime},#{endTime},#{colAmounts},#{riqi},#{agent},#{depCode},#{remark},0,#{inspector},
+		CONVERT (VARCHAR(100), GETDATE(), 20),#{deviceNumber},#{devicePice},#{simNumber},#{simPice},#{upkeep},#{upkeepPice})
+	</insert>
+
+	<update id="billing" parameterType="hashmap">
+		IF EXISTS(SELECT * FROM OA_PROVE WHERE NUMBER = #{number})
+		BEGIN
+	           UPDATE OA_PROVE set ustate=1, purpose=#{purpose},carNumber=#{carNumber},amounts = #{colAmounts},startTime=#{startTime} ,endTime =#{endTime}
+	           where NUMBER=#{number}
+		END
+	</update>
+
+	<update id="updateVehicle" parameterType="hashmap">
+		UPDATE OA_VEHICLE SET
+		networkNo=#{number},
+		amounts=#{colAmounts},
+		startTime=#{startTime},
+		endTime=#{endTime},
+		feeseEnd=#{endTime},
+		payerTime=#{riqi}
+		WHERE ID =
+		#{caruid}
+	</update>
+
+
+	<!-- 收费记录SQL -->
+	<select id="listByPayFees" resultType="PayFees" parameterType="hashmap">
+			SELECT
+			<include refid="sql_payFees" />
+			FROM OA_PAYFEES
+			<where>
+				<if test="carNumber != null  and carNumber != ''">
+					AND CARNUMBER LIKE '%'+#{carNumber}+'%'
+				</if>
+				 
+				<if test="sfriqi != null  and sfriqi != ''">
+					AND sfriqi &gt;= #{sfriqi}
+				</if>
+				<if test="sfriqi1 != null  and sfriqi1 != ''">
+					AND sfriqi &lt;= #{sfriqi1}
+				</if>
+			</where>
+	</select>
+	
+	<insert id="payFees" parameterType="hashmap">
+		INSERT INTO OA_PAYFEES
+		(carNumber,owner,fees,sfry,sfriqi,initriqi ,startTime,endTime,purpose,companyName,ownerTel,remark)
+		VALUES
+		(#{carNumber},#{owner},#{fees},#{sfry},#{sfriqi},CONVERT (VARCHAR(100), GETDATE(), 20),#{startTime},#{endTime},#{purpose},#{companyName},#{ownerTel},#{remark})
+	</insert>
+</mapper>

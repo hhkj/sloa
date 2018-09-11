@@ -128,7 +128,7 @@
 				$.ajax({
 					cache : false,
 					type : "POST",
-					url : '../menus/addMenus',
+					url : '../role/save',
 					data : $("#vui_sample").serialize(),
 					async : false,
 					success : function(data) {
